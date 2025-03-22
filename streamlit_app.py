@@ -137,7 +137,12 @@ def process_file(uploaded_file, user_prompt_text):
                 # Check if percentComplete is above 80
                 if percent_complete > 80:
                     # If percentComplete is above 80, generate technical questions
-                    generate_technical_questions(extracted_info)
+                    user_question_prompt = st.text_area(
+                        "Enter your custom prompt for generating technical questions (optional):",
+                        height=200
+                    )
+                    if user_question_prompt:
+                        generate_technical_questions(extracted_info, user_question_prompt)
 
             except json.JSONDecodeError:
                 st.error("The returned content is not in valid JSON format.")
