@@ -161,23 +161,23 @@ def generate_technical_questions(extracted_info):
     Output format: JSON:
     [
         {
-            "question": "<Question Text>",
+            "question": "Question Text",
             "options": [
-            "<Option 1>",
-            "<Option 2>",
-            "<Option 3>",
-            "<Option 4>"
+            "Option 1",
+            "Option 2",
+            "Option 3",
+            "Option 4"
             ],
-            "correct_answer": "<Correct Option>",
-            "seniority": "<Seniority level>",
+            "correct_answer": "Correct Option",
+            "seniority": "Seniority level",
             "skills": [
-            "<Skill 1>",
-            "<Skill 2>",
+            "Skill 1",
+            "Skill 2",
             "..."
             ],
-            "domain": [
-            "<Domain 1>",
-            "<Domain 2>",
+            "domains": [
+            "Domain 1",
+            "Domain 2",
             "..."
             ]
         }
