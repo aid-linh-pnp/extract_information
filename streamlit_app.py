@@ -152,47 +152,10 @@ def process_file(uploaded_file, user_prompt_text):
 def generate_technical_questions(extracted_info):
     # Prepare the prompt for generating technical questions
     technical_questions_prompt = f"""
-    Generate 20 technical interview multiple questions based on the following resume information:
+    Generate 20 technical interview questions based on the following resume information:
     {json.dumps(extracted_info, indent=2)}
     The questions should be relevant to the skills and experience listed in the resume.
-    """
-
-    # Make the second API request to generate technical questions
-    data = {
-        "messages": [{"role": "user", "content": technical_questions_prompt}],
-        "max_tokens": 10000,
-        "temperature": 1,
-        "top_p": 0.25
-    }
-
-    st.info("Sending request to OpenAI API for technical questions...")
-    try:
-        response = requests.post(
-            endpoint, 
-            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
-            data=json.dumps(data)
-        )
-        
-        if response.status_code == 200:
-            generated_questions = response.json()['choices'][0]['message']['content']
-            
-            # Display the generated technical questions
-            st.subheader("Generated Technical Questions")
-            st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
-        
-        else:
-            st.error(f"Request failed with status code {response.status_code}")
-            st.write(response.text)
-    except Exception as e:
-        st.error(f"Error during technical questions generation: {e}")
-
-# Function to generate technical questions based on the CV information
-def generate_technical_questions(extracted_info):
-    # Prepare the prompt for generating technical questions
-    technical_questions_prompt = f"""
-    Generate 20 technical interview multiple questions based on the following resume information:
-    {json.dumps(extracted_info, indent=2)}
-    The questions should be relevant to the skills and experience listed in the resume.
+    Based on the candidate's seniority, adjust the difficulty level of the questions.
     """
 
     # Make the second API request to generate technical questions
