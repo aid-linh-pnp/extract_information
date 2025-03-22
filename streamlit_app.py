@@ -137,12 +137,38 @@ def process_file(uploaded_file, user_prompt_text):
                 # Check if percentComplete is above 80
                 if percent_complete > 80:
                     # If percentComplete is above 80, generate technical questions
-                    user_question_prompt = st.text_area(
-                        "Enter your custom prompt for generating technical questions (optional):",
-                        height=200
-                    )
-                    if user_question_prompt:
-                        generate_technical_questions(extracted_info, user_question_prompt)
+                    user_question_prompt = """
+                    Generate 20 technical interview multiple questions based on the following resume information:
+                    {json.dumps(extracted_info, indent=2)}
+                    The questions should be relevant to the skills and experience listed in the resume.
+                    Based on the candidate's seniority, adjust the difficulty level of the questions.
+                    Output format: JSON:
+                    [
+                        {{
+                            "question": "Question Text",
+                            "options": [
+                                "Option 1",
+                                "Option 2",
+                                "Option 3",
+                                "Option 4"
+                            ],
+                            "correct_answer": "Correct Option",
+                            "seniority": "Seniority level",
+                            "skills": [
+                                "Skill 1",
+                                "Skill 2",
+                                "..."
+                            ],
+                            "domains": [
+                                "Domain 1",
+                                "Domain 2",
+                                "..."
+                            ]
+                        }}
+                    ]
+                    """
+
+                    generate_technical_questions(extracted_info, user_question_prompt)
 
             except json.JSONDecodeError:
                 st.error("The returned content is not in valid JSON format.")
@@ -157,43 +183,14 @@ def process_file(uploaded_file, user_prompt_text):
 
 # Function to generate technical questions based on the CV information
 def generate_technical_questions(extracted_info, user_question_prompt):
-    # Prepare the prompt for generating technical questions
-    technical_questions_prompt = f"""
-    Generate 20 technical interview multiple questions based on the following resume information:
-    {json.dumps(extracted_info, indent=2)}
-    The questions should be relevant to the skills and experience listed in the resume.
-    Based on the candidate's seniority, adjust the difficulty level of the questions.
-    Output format: JSON:
-    [
-        {{
-            "question": "Question Text",
-            "options": [
-                "Option 1",
-                "Option 2",
-                "Option 3",
-                "Option 4"
-            ],
-            "correct_answer": "Correct Option",
-            "seniority": "Seniority level",
-            "skills": [
-                "Skill 1",
-                "Skill 2",
-                "..."
-            ],
-            "domains": [
-                "Domain 1",
-                "Domain 2",
-                "..."
-            ]
-        }}
-    ]
-    """
+    # Process the user prompt by replacing the extracted information
+    final_user_prompt = user_question_prompt.replace("{json.dumps(extracted_info, indent=2)}", json.dumps(extracted_info, indent=2))
 
     # Make the second API request to generate technical questions
     data = {
         "messages": [
             {"role": "system", "content": "You are an expert technical interviewer. Generate relevant and challenging questions for the candidate based on the provided resume information. Remove ```json."},     
-            {"role": "user", "content": technical_questions_prompt}
+            {"role": "user", "content": final_user_prompt}
         ],
         "max_tokens": 10000,
         "temperature": 1,
@@ -362,7 +359,6 @@ def main():
         #### Analyze Content:
         text
         {extracted_text}"""
-
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
     
