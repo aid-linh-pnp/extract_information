@@ -321,6 +321,11 @@ def main():
         12. **Seniority**:
             - Assess the candidate’s seniority based on work experience, responsibilities, and expertise.
 
+        #### Required from OpenAI reasoning:
+        - seniority
+        - percentComplete
+        - careerPath
+
         #### Output:
         Return only valid JSON formatted as per the schema above.
         Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
