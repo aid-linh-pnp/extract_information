@@ -160,27 +160,27 @@ def generate_technical_questions(extracted_info):
     Based on the candidate's seniority, adjust the difficulty level of the questions.
     Output format: JSON:
     [
-        {
+        {{
             "question": "Question Text",
             "options": [
-            "Option 1",
-            "Option 2",
-            "Option 3",
-            "Option 4"
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4"
             ],
             "correct_answer": "Correct Option",
             "seniority": "Seniority level",
             "skills": [
-            "Skill 1",
-            "Skill 2",
-            "..."
+                "Skill 1",
+                "Skill 2",
+                "..."
             ],
             "domains": [
-            "Domain 1",
-            "Domain 2",
-            "..."
+                "Domain 1",
+                "Domain 2",
+                "..."
             ]
-        }
+        }}
     ]
     """
 
