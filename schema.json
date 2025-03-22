@@ -1,280 +1,127 @@
 {
-    "basics": {
-        "name": {
-            "type": "string",
-            "description": "e.g. Nguyen Van A"
-        },
-        "birthday": {
-            "$ref": "#/definitions/iso8601",
-            "description": "e.g. 2000-11-03T16:28:18.663"
-        },
-        "gender": {
-            "type": "number",
-            "description": "e.g. 0: male, 1: female, null: empty string"
-        },
-        "picture": null,
-        "expectWorkingPlace": {
-            "type": "string",
-            "description": "code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"
-        },
-        "experienceYears": {
-            "type": "number",
-            "description": "Round up, If no information, value: null, Just experience related work"
-        },
-        "summary": {
-            "type": "string",
-            "description": "Write a short 2-3 sentence biography about yourself"
-        },
-        "location": {
-            "address": {
-                "type": "string",
-                "description": "code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"
-            }
-        },
-        "profiles": {
-            "emailAddress": [
-                {
-                    "value": "e.g. thomas@gmail.com",
-                    "network": "Email"
-                },
-                {
-                    "value": "e.g. thomas@gmail.com",
-                    "network": "Email"
-                }
-            ],
-            "phoneNumbers": [
-                {
-                    "value": "0912345678",
-                    "network": "Phone"
-                },
-                {
-                    "value": "123456789",
-                    "network": "Phone"
-                }
-            ],
-            "ims": [
-                {
-                    "value": "Instant Messenger",
-                    "network": "Ims"
-                }
-            ],
-            "websites": [
-                {
-                    "value": "facebook.com/ttt",
-                    "network": "Website"
-                }
-            ]
-        },
-        "cvs": []
+    "contact": {
+      "phoneNumbers": [
+        "<Extracted Phone 1>",
+        "<Extracted Phone 2>",
+        "..."
+      ],
+      "emails": [
+        "<Extracted Email 1>",
+        "<Extracted Email 2>",
+        "..."
+      ],
+      "address": "<Extracted Address>"
     },
-    "work": {
-      "type": "array",
-      "description": "If you've held multiple positions at the same company, please list each role with its corresponding dates, including the company name, job title, start and end dates, and a detailed description of your duties and responsibilities for each position. Be sure to specify each role separately with the relevant tasks and projects..",
-      "properties": {
-            "company": {
-                "type": "string",
-                "description": "e.g. ABC Corporation"
-            },
-            "position":
-            {
-                "type": "string",
-                "description": "e.g. Software Engineer"
-            },
-            "startDate": {
-                "$ref": "#/definitions/iso8601",
-                "description": "e.g. 2000-11-03T16:28:18.663"
-            },
-            "endDate": {
-                "$ref": "#/definitions/iso8601",
-                "description": "e.g. 2000-11-03T16:28:18.663"
-            },
-            "tenure": {
-                "type": "number (months)",
-                "description": "e.g. 36"
-            },
-            "age": {
-                "type": "number (years)",
-                "description": "e.g. 25"
-            },
-            "summary": {
-                "type": "string",
-                "description": "Give an overview of your responsibilities at the company. Follow full description of CV"
-            }
-        }
-    },
-    "publications": {
-      "type": "array",
-      "description": "Specify your publications through your career",
-      "additionalItems": false,
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "e.g. The World Wide Web"
-          },
-          "publisher": {
-            "type": "string",
-            "description": "e.g. IEEE, Computer Magazine"
-          },
-          "releaseDate": {
-            "$ref": "#/definitions/iso8601",
-            "description": "e.g. YYYY-MM-DDThh:mm:ss.sssZ"
-          },
-          "url": {
-            "type": "string",
-            "description": "e.g. http://www.computer.org.example.com/csdl/mags/co/1996/10/rx069-abs.html",
-            "format": "uri"
-          },
-          "summary": {
-            "type": "string",
-            "description": "Short summary of publication. e.g. Discussion of the World Wide Web, HTTP, HTML."
-          }
-        }
-      }
-    },
-    "projects": {
-      "type": "array",
-      "description": "Specify career projects",
-      "additionalItems": false,
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "e.g. The World Wide Web"
-          },
-          "description": {
-            "type": "string",
-            "description": "Short summary of project. e.g. Collated works of 2017."
-          },
-          "startDate": {
-            "$ref": "#/definitions/iso8601",
-            "description": "e.g. YYYY-MM-DDThh:mm:ss.sssZ"
-          },
-          "endDate": {
-            "$ref": "#/definitions/iso8601",
-            "description": "e.g. YYYY-MM-DDThh:mm:ss.sssZ"
-          },
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "description": "e.g. http://www.computer.org/csdl/mags/co/1996/10/rx069-abs.html"
-          }
-        }
-      }
-    },
-    "education": [
-        {
-            "institution": {
-                "type": "string",
-                "description": "e.g. Massachusetts Institute of Technology"
-            },
-            "area": {
-                "type": "string",
-                "description": "e.g. Arts"
-            },
-            "studyType": {
-                "type": "string",
-                "description": "e.g. University"
-            },
-            "startDate": {
-                "$ref": "#/definitions/iso8601",
-                "description": "e.g. 2000-11-03T16:28:18.663"
-            },
-            "endDate": {
-                "$ref": "#/definitions/iso8601",
-                "description": "e.g. 2000-11-03T16:28:18.663"
-            },
-            "gpa": {
-                "type": "string",
-                "description": "grade point average, e.g. 3.67/4.0"
-            }
-        }
+    "nationalities": [
+      "<Extracted Nationality 1>",
+      "<Extracted Nationality 2>",
+      "..."
     ],
-    "awards": [
-        {
-            "title": {
-                "type": "string",
-                "description": " Awards or Certification, e.g. One of the 100 greatest minds of the century or Certified Kubernetes Administrator or AWS Cloud"
-            },
-            "date": {
-                "$ref": "#/definitions/iso8601",
-                "description": "e.g. 2000-00-00T00:00:00.000"
-            },
-            "summary": {
-                "type": "string",
-                "description": "e.g. Received for my work with Quantum Physics or Certified Kubernetes Administrator"
-            }
-        }
+    "profiles": [
+      {
+        "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
+        "url": "<Profile URL>"
+      }
+    ],
+    "professional_summary": "<Extracted Professional Summary>",
+    "work_experiences": [
+      {
+        "jobTitle": "<Extracted Job Title>",
+        "employerName": "<Extracted Employer Name>",
+        "startDate": "<Formatted Start Date (ISO 8601)>",
+        "endDate": "<Formatted End Date (ISO 8601)>",
+        "tenure": "<Calculated Tenure in Months>",
+        "ageAtStart": "<Calculated Age at Start>",
+        "ageAtEnd": "<Calculated Age at End>",
+        "responsibilities": [
+          "<Responsibility 1>",
+          "<Responsibility 2>",
+          "..."
+        ],
+        "skillsUsed": [
+          "<Skill 1>",
+          "<Skill 2>",
+          "..."
+        ],
+        "impact": "<Brief description of achievements or outcomes>",
+        "roleType": "<Full-Time, Part-Time, Freelancer>",
+        "timeAllocation": "<Percentage if overlapping roles>",
+        "team": "<Team Name>",
+        "projects": [
+          {
+            "projectName": "<Project Name>",
+            "role": "<Role in Project>",
+            "responsibilities": [
+              "<Responsibility 1>",
+              "..."
+            ],
+            "skillsUsed": [
+              "<Skill 1>",
+              "..."
+            ],
+            "impact": "<Project outcome>"
+          }
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "<Extracted Degree>",
+        "institution": "<Extracted Institution>",
+        "startYear": "<Start Year>",
+        "endYear": "<End Year>",
+        "score": "<Extracted Score (GPA/Percentage)>"
+      }
     ],
     "skills": {
-      "type": "array",
-      "description": "Soft skills not included, just technical skills. List out all skills",
-      "additionalItems": false,
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Only take technical skill and 1 object is only 1 skill, e.g. HTML"
-          },
-          "level": {
-            "type": "string",
-            "description": "e.g. Master"
-          }
-        }
-      }
+      "technicalSkills": [
+        "<Technical Skill 1>",
+        "<Technical Skill 2>",
+        "..."
+      ],
+      "softSkills": [
+        "<Soft Skill 1>",
+        "<Soft Skill 2>",
+        "..."
+      ]
     },
-    "languages": {
-      "type": "array",
-      "description": "List any other languages you speak",
-      "additionalItems": false,
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "language": {
-            "type": "string",
-            "description": "e.g. English, Spanish"
-          },
-          "fluency": {
-            "type": "string",
-            "description": "e.g. Fluent, Beginner"
-          }
-        }
+    "awards": [
+      "<Award 1>",
+      "<Award 2>",
+      "..."
+    ],
+    "certifications": [
+      "<Certification 1>",
+      "<Certification 2>",
+      "..."
+    ],
+    "publications": [
+      {
+        "title": "<Publication Title>",
+        "date": "<Publication Date (ISO 8601)>",
+        "journal": "<Journal/Publisher Name>",
+        "description": "<Brief Description>"
       }
+    ],
+    "languages": [
+      {
+        "language": "<Language Name>",
+        "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
+      }
+    ],
+    "additional_information": [
+      "<Additional Info 1>",
+      "..."
+    ],
+    "careerInsights": {
+      "careerPath": "<Summary of career trajectory>",
+      "industryExperience": [
+        "<Industry 1>",
+        "<Industry 2>",
+        "..."
+      ]
     },
-    "references": {
-      "type": "array",
-      "description": "List references you have received",
-      "additionalItems": false,
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "e.g. Timothy Cook"
-          },
-          "reference": {
-            "type": "string",
-            "description": "e.g. Joe blogs was a great employee, who turned up to work at least once a week. He exceeded my expectations when it came to doing nothing."
-          }
-        }
-      }
-    },
-    "nationalities": {
-            "code": {
-                "type": "string",
-                "description": "code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"
-            },
-            "nationality": {
-                "type": "string",
-                "description": "code as per ISO-3166-1 ALPHA-2, e.g. US, AU, IN"
-            }
-      }
+    "cv_analysis": {
+      "percentComplete": "<Calculated Completeness Percentage>"
+    }
   }

@@ -123,26 +123,140 @@ def process_file(uploaded_file, user_prompt_text):
 # Streamlit interface
 def main():
     st.title('Resume Information Extractor')
-    
+
     # Session state to persist the prompt between reruns
     if 'prompt_text' not in st.session_state:
-        st.session_state.prompt_text = """Use the following schema to structure the extracted information: {json.dumps(schema_json)}
-        Only return valid JSON with the extracted information, without any additional explanations.
-        Export object format to store json file.
-        List all skills.
-        If date: 2023-00-00T00:00:00.000 change to 2023-01-01T00:00:00.000
-        Please list all positions held at the same company along with their corresponding time periods, company name, and detailed duties and responsibilities for each role. If the same position is held at different times or in different teams within the same company, include each occurrence separately with its unique time period and team information. Ensure that all distinct roles, teams, and time periods are captured in a *separate array item* for each specific instance.
-        - If the CV does not include the person's age, calculate the age as the person's first year of work minus 22 years old.
-        - The age will be calculated as the year when the person left the job at the company, based on the tenure at each company. 
-        - If the CV mentions multiple jobs with overlapping dates, *both jobs should be included*, with the same age calculated based on the year when the candidate left the job.
-        - Ensure that all freelancer jobs are included in the output.
-        - Tenure is month format.
-        - This year is {current_year}. Calculate age as the person's age when they left each company. 
-        If the CV does not include age, the age will be based on the candidate's first year of work minus 22 years old. 
-        If there are multiple jobs with overlapping dates, both jobs should be included with the same age calculated as the year when they left the job. Ensure that all freelancer jobs are included in the output.
-        Text extracted from PDF (with coordinates). Keep the language of the CV unchanged:
-        Analyze file content: {extracted_text}"""
-    
+        st.session_state.prompt_text = """Extract all relevant information from the provided CV and structure it using the schema below. Ensure the extracted information is precise and consistent with the requirements.
+
+#### Schema:
+{
+  "contact": {
+    "phoneNumbers": ["<Extracted Phone 1>", "<Extracted Phone 2>", "..."],
+    "emails": ["<Extracted Email 1>", "<Extracted Email 2>", "..."],
+    "address": "<Extracted Address>"
+  },
+  "nationalities": ["<Extracted Nationality 1>", "<Extracted Nationality 2>", "..."],
+  "profiles": [
+    {
+      "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
+      "url": "<Profile URL>"
+    }
+  ],
+  "professional_summary": "<Extracted Professional Summary>",
+  "work_experiences": [
+    {
+      "jobTitle": "<Extracted Job Title>",
+      "employerName": "<Extracted Employer Name>",
+      "startDate": "<Formatted Start Date (ISO 8601)>",
+      "endDate": "<Formatted End Date (ISO 8601)>",
+      "tenure": "<Calculated Tenure in Months>",
+      "ageAtStart": "<Calculated Age at Start>",
+      "ageAtEnd": "<Calculated Age at End>",
+      "responsibilities": ["<Responsibility 1>", "<Responsibility 2>", "..."],
+      "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
+      "impact": "<Brief description of achievements or outcomes>",
+      "roleType": "<Full-Time, Part-Time, Freelancer>",
+      "timeAllocation": "<Percentage if overlapping roles>",
+      "team": "<Team Name>",
+      "projects": [
+        {
+          "projectName": "<Project Name>",
+          "role": "<Role in Project>",
+          "responsibilities": ["<Responsibility 1>", "..."],
+          "skillsUsed": ["<Skill 1>", "..."],
+          "impact": "<Project outcome>"
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "<Extracted Degree>",
+      "institution": "<Extracted Institution>",
+      "startYear": "<Start Year>",
+      "endYear": "<End Year>",
+      "score": "<Extracted Score (GPA/Percentage)>"
+    }
+  ],
+  "skills": {
+    "technicalSkills": ["<Technical Skill 1>", "<Technical Skill 2>", "..."],
+    "softSkills": ["<Soft Skill 1>", "<Soft Skill 2>", "..."]
+  },
+  "awards": ["<Award 1>", "<Award 2>", "..."],
+  "certifications": ["<Certification 1>", "<Certification 2>", "..."],
+  "publications": [
+    {
+      "title": "<Publication Title>",
+      "date": "<Publication Date (ISO 8601)>",
+      "journal": "<Journal/Publisher Name>",
+      "description": "<Brief Description>"
+    }
+  ],
+  "languages": [
+    {
+      "language": "<Language Name>",
+      "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
+    }
+  ],
+  "additional_information": ["<Additional Info 1>", "..."],
+  "careerInsights": {
+    "careerPath": "<Summary of career trajectory>",
+    "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
+  },
+  "cv_analysis": {
+    "percentComplete": "<Calculated Completeness Percentage>"
+  }
+}
+
+#### Guidelines:
+1. *Contact Details*:
+   - Extract all phone numbers and emails mentioned in the CV. Ensure each is listed separately in the phoneNumbers and emails arrays.
+
+2. *Nationalities*:
+   - Extract all nationalities mentioned in the CV and list them in the nationalities array.
+
+3. *Profiles*:
+   - Extract all online profiles (e.g., LinkedIn, GitHub) mentioned in the CV, including the platform name and URL.
+
+4. *Formatting Dates*:
+   - Ensure all dates are in ISO 8601 format (YYYY-MM-DDTHH:MM:SS.000).
+   - Replace placeholder or incomplete dates (e.g., 2023-00-00) with 2023-01-01T00:00:00.000.
+
+5. *Work Experiences*:
+   - Include all positions held at the same company, capturing each distinct job title, time period, team information (if applicable), and detailed responsibilities. If a position was held multiple times or in different teams, treat each as a separate array item.
+   - Include overlapping jobs with accurate start and end dates.
+   - Calculate tenure in months for each role.
+   - Calculate the candidate's age at the start and end of each job:
+     - If the CV does not include the person's birth year, estimate their age by subtracting 22 years from their first year of work.
+
+6. *Education*:
+   - Include degree, institution, years of study, and score (e.g., GPA, percentage).
+
+7. *Skills*:
+   - Extract and list all technical and soft skills mentioned in the CV.
+
+8. *Awards, Certifications, and Publications*:
+   - Include all awards, certifications, and publications with relevant details.
+
+9. *Languages*:
+   - List all languages spoken, along with proficiency levels (e.g., Native, Fluent, Intermediate).
+
+10. *Derived Insights*:
+    - Add careerInsights such as careerPath (a summary of the candidate's career trajectory) and industryExperience (industries the candidate has worked in).
+
+11. *CV Completeness*:
+    - Evaluate the percentage completeness of the CV based on the presence of key sections (contact, professional summary, work experiences, education, skills).
+    - Assign a percentage (e.g., 100% for a complete CV).
+
+#### Output:
+Return only valid JSON formatted as per the schema above.
+Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
+
+
+#### Analyze Content:
+text
+{extracted_text}"""
+
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
     
@@ -164,6 +278,3 @@ def main():
             with st.spinner('Processing with your customized prompt...'):
                 # Pass the current value from session state to ensure latest edits are used
                 process_file(uploaded_file, st.session_state.prompt_text)
-
-if __name__ == "__main__":
-    main()
