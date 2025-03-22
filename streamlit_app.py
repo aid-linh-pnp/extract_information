@@ -153,7 +153,36 @@ def process_file(uploaded_file, user_prompt_text):
 # Function to generate technical questions based on the CV information
 def generate_technical_questions(extracted_info, user_question_prompt):
     # Prepare the prompt for generating technical questions
-    technical_questions_prompt = user_question_prompt.format(extracted_info=json.dumps(extracted_info, indent=2))
+    technical_questions_prompt = f"""
+    Generate 20 technical interview multiple questions based on the following resume information:
+    {json.dumps(extracted_info, indent=2)}
+    The questions should be relevant to the skills and experience listed in the resume.
+    Based on the candidate's seniority, adjust the difficulty level of the questions.
+    Output format: JSON:
+    [
+        {{
+            "question": "Question Text",
+            "options": [
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4"
+            ],
+            "correct_answer": "Correct Option",
+            "seniority": "Seniority level",
+            "skills": [
+                "Skill 1",
+                "Skill 2",
+                "..."
+            ],
+            "domains": [
+                "Domain 1",
+                "Domain 2",
+                "..."
+            ]
+        }}
+    ]
+    """
 
     # Make the second API request to generate technical questions
     data = {
@@ -329,38 +358,6 @@ def main():
         text
         {extracted_text}"""
 
-    if 'questions_prompt' not in st.session_state:
-        st.session_state.questions_prompt = """Generate 20 technical interview multiple questions based on the following resume information:
-            {json.dumps(extracted_info, indent=2)}
-            The questions should be relevant to the skills and experience listed in the resume.
-            Based on the candidate's seniority, adjust the difficulty level of the questions.
-            Output format: JSON:
-            [
-                {{
-                    "question": "Question Text",
-                    "options": [
-                        "Option 1",
-                        "Option 2",
-                        "Option 3",
-                        "Option 4"
-                    ],
-                    "correct_answer": "Correct Option",
-                    "seniority": "Seniority level",
-                    "skills": [
-                        "Skill 1",
-                        "Skill 2",
-                        "..."
-                    ],
-                    "job_title": "Job Title",
-                    "domains": [
-                        "Healthcare",
-                        "Banking",
-                        "..."
-                    ]
-                }}
-            ]
-        """
-
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
     
@@ -370,20 +367,11 @@ def main():
     
     # Text area for editing the prompt with key to track changes
     st.text_area(
-        "Edit the prompt to send to OpenAI for CV extraction:", 
+        "Edit the prompt to send to OpenAI:", 
         value=st.session_state.prompt_text, 
         height=400,
         key="prompt_input",
         on_change=update_prompt
-    )
-    
-    # Input area for technical questions generation prompt
-    st.text_area(
-        "Edit the prompt to generate technical questions based on the resume:", 
-        value=st.session_state.questions_prompt, 
-        height=400,
-        key="questions_input",
-        on_change=lambda: st.session_state.update_questions_prompt
     )
     
     if uploaded_file is not None:
