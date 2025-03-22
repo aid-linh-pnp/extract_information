@@ -78,6 +78,7 @@ def process_file(uploaded_file, user_prompt_text):
             Keep the language of the CV unchanged.
             Remove special characters to properly format it as an object before saving it to a JSON file.
             Remove ```json, remove $schema. 
+            Required: seniority, careerPath, percentComplete.
         """
     }
 
@@ -320,7 +321,7 @@ def main():
         
         12. **Seniority**:
             - Assess the candidate’s seniority based on work experience, responsibilities, and expertise.
-            - 4 level: Fresher, Junior, Middle, Senior.
+            - Just 4 level: Fresher, Junior, Middle, Senior.
         #### Output:
         Return only valid JSON formatted as per the schema above.
         Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
