@@ -125,8 +125,15 @@ def process_file(uploaded_file, user_prompt_text):
                 # Show the parsed JSON if possible
                 st.json(extracted_info)
 
+                # Safely extract and convert percentComplete to a number
+                percent_complete = extracted_info.get("cv_analysis", {}).get("percentComplete", 0)
+                try:
+                    percent_complete = float(percent_complete)
+                except ValueError:
+                    percent_complete = 0  # Default to 0 if conversion fails
+
                 # Check if percentComplete is above 80
-                if "cv_analysis" in extracted_info and extracted_info["cv_analysis"].get("percentComplete", 0) > 80:
+                if percent_complete > 80:
                     # If percentComplete is above 80, generate technical questions
                     generate_technical_questions(extracted_info)
 
