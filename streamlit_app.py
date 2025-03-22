@@ -126,50 +126,12 @@ def process_file(uploaded_file, user_prompt_text):
                 extracted_info = json.loads(generated_text)  # Try to parse as JSON
                 # Show the parsed JSON if possible
                 st.json(extracted_info)
-
-                # Safely extract and convert percentComplete to a number
-                percent_complete = extracted_info.get("cv_analysis", {}).get("percentComplete", 0)
-                try:
-                    percent_complete = float(percent_complete)
-                except ValueError:
-                    percent_complete = 0  # Default to 0 if conversion fails
-
-                # Check if percentComplete is above 80
-                if percent_complete > 80:
-                    # If percentComplete is above 80, generate technical questions
-                    user_question_prompt = """
-                    Generate 15 technical interview multiple questions based on the following resume information:
-                    {json.dumps(extracted_info, indent=2)}
-                    The questions should be relevant to the skills and experience listed in the resume.
-                    Based on the candidate's seniority, adjust the difficulty level of the questions.
-                    Output format: JSON:
-                    [
-                        {{
-                            "question": "Question Text",
-                            "options": [
-                                "Option 1",
-                                "Option 2",
-                                "Option 3",
-                                "Option 4"
-                            ],
-                            "correct_answer": "Correct Option",
-                            "seniority": "Seniority level",
-                            "skills": [
-                                "Skill 1",
-                                "Skill 2",
-                                "..."
-                            ],
-                            "job_title": "Job Title",
-                            "domains": [
-                                "Healthcare",
-                                "Banking",
-                                "..."
-                            ]
-                        }}
-                    ]
-                    """
-
-                    generate_technical_questions(extracted_info, user_question_prompt)
+                
+                # Store the extracted information in session state for later use
+                st.session_state.extracted_info = extracted_info
+                
+                # Show the question generation input area
+                st.session_state.show_question_input = True
 
             except json.JSONDecodeError:
                 st.error("The returned content is not in valid JSON format.")
@@ -186,6 +148,10 @@ def process_file(uploaded_file, user_prompt_text):
 def generate_technical_questions(extracted_info, user_question_prompt):
     # Process the user prompt by replacing the extracted information
     final_user_prompt = user_question_prompt.replace("{json.dumps(extracted_info, indent=2)}", json.dumps(extracted_info, indent=2))
+
+    # Display what's being sent (for debugging)
+    with st.expander("View processed question prompt being sent to API"):
+        st.text_area("Final question prompt sent to API:", value=final_user_prompt, height=200, disabled=True)
 
     # Make the second API request to generate technical questions
     data = {
@@ -212,6 +178,14 @@ def generate_technical_questions(extracted_info, user_question_prompt):
             # Display the generated technical questions
             st.subheader("Generated Technical Questions")
             st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
+            
+            # Try to parse as JSON for better display
+            try:
+                questions_json = json.loads(generated_questions)
+                st.json(questions_json)
+            except json.JSONDecodeError:
+                # If not valid JSON, the text area above will still show the content
+                pass
         
         else:
             st.error(f"Request failed with status code {response.status_code}")
@@ -223,7 +197,7 @@ def generate_technical_questions(extracted_info, user_question_prompt):
 def main():
     st.title('Resume Information Extractor')
 
-    # Session state to persist the prompt between reruns
+    # Initialize session state variables
     if 'prompt_text' not in st.session_state:
         st.session_state.prompt_text = """### Updated Enhanced Prompt with OpenAI-Friendly Schema
 
@@ -351,7 +325,7 @@ def main():
             - Assign a percentage (e.g., 100% for a complete CV).
         
         12. Seniority:
-            - OpenAI will assess the candidate’s seniority based on the work experience, responsibilities, and expertise mentioned in the CV.
+            - OpenAI will assess the candidate's seniority based on the work experience, responsibilities, and expertise mentioned in the CV.
             - The seniority levels will be classified into 4 categories: Fresher, Junior, Middle, Senior.
         #### Output:
         Return only valid JSON formatted as per the schema above.
@@ -361,16 +335,59 @@ def main():
         text
         {extracted_text}"""
 
+    if 'question_prompt_text' not in st.session_state:
+        st.session_state.question_prompt_text = """
+        Generate 15 technical interview multiple questions based on the following resume information:
+        {json.dumps(extracted_info, indent=2)}
+        The questions should be relevant to the skills and experience listed in the resume.
+        Based on the candidate's seniority, adjust the difficulty level of the questions.
+        Output format: JSON:
+        [
+            {
+                "question": "Question Text",
+                "options": [
+                    "Option 1",
+                    "Option 2",
+                    "Option 3",
+                    "Option 4"
+                ],
+                "correct_answer": "Correct Option",
+                "seniority": "Seniority level",
+                "skills": [
+                    "Skill 1",
+                    "Skill 2",
+                    "..."
+                ],
+                "job_title": "Job Title",
+                "domains": [
+                    "Healthcare",
+                    "Banking",
+                    "..."
+                ]
+            }
+        ]
+        """
+    
+    if 'show_question_input' not in st.session_state:
+        st.session_state.show_question_input = False
+    
+    if 'extracted_info' not in st.session_state:
+        st.session_state.extracted_info = None
+
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
     
-    # Function to update session state
+    # Function to update session state for extract prompt
     def update_prompt():
         st.session_state.prompt_text = st.session_state.prompt_input
     
+    # Function to update session state for question prompt
+    def update_question_prompt():
+        st.session_state.question_prompt_text = st.session_state.question_prompt_input
+    
     # Text area for editing the prompt with key to track changes
     st.text_area(
-        "Edit the prompt to send to OpenAI:", 
+        "Edit the prompt to send to OpenAI for CV extraction:", 
         value=st.session_state.prompt_text, 
         height=400,
         key="prompt_input",
@@ -382,6 +399,28 @@ def main():
             with st.spinner('Processing with your customized prompt...'):
                 # Pass the current value from session state to ensure latest edits are used
                 process_file(uploaded_file, st.session_state.prompt_text)
+    
+    # Display question generation input only after extraction is complete
+    if st.session_state.show_question_input and st.session_state.extracted_info is not None:
+        st.markdown("---")
+        st.subheader("Generate Technical Questions")
+        
+        # Text area for editing the question prompt
+        st.text_area(
+            "Edit the prompt to send to OpenAI for question generation:", 
+            value=st.session_state.question_prompt_text, 
+            height=300,
+            key="question_prompt_input",
+            on_change=update_question_prompt
+        )
+        
+        if st.button("Generate Questions"):
+            with st.spinner('Generating technical questions...'):
+                # Pass the current value from session state
+                generate_technical_questions(
+                    st.session_state.extracted_info, 
+                    st.session_state.question_prompt_text
+                )
 
 if __name__ == "__main__":
     main()
