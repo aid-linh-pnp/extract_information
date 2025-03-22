@@ -186,7 +186,10 @@ def generate_technical_questions(extracted_info):
 
     # Make the second API request to generate technical questions
     data = {
-        "messages": [{"role": "user", "content": technical_questions_prompt}],
+        "messages": [
+            {"role": "system", "content": "You are an expert technical interviewer. Generate relevant and challenging questions for the candidate based on the provided resume information. Remove ```json."},     
+            {"role": "user", "content": technical_questions_prompt}
+        ],
         "max_tokens": 10000,
         "temperature": 1,
         "top_p": 0.25
