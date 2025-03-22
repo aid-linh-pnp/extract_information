@@ -225,7 +225,7 @@ def main():
             "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
             "impact": "<Brief description of achievements or outcomes>",
             "roleType": "<Full-Time, Part-Time, Freelancer>",
-            "seniority": "<Seniority Level>",
+            "seniority": "<Seniority Level> (required from OpenAI)",
             "timeAllocation": "<Percentage if overlapping roles>",
             "team": "<Team Name>",
             "projects": [
@@ -270,11 +270,11 @@ def main():
         ],
         "additional_information": ["<Additional Info 1>", "..."],
         "careerInsights": {
-            "careerPath": "<Summary of career trajectory>",
+            "careerPath": "<Summary of career trajectory> (required from OpenAI)",
             "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
         },
         "cv_analysis": {
-            "percentComplete": "<Calculated Completeness Percentage> (eg. 70)"
+            "percentComplete": "<Calculated Completeness Percentage> (eg. 70) (required from OpenAI)"
         }
         }
 
@@ -320,16 +320,10 @@ def main():
         
         12. **Seniority**:
             - Assess the candidate’s seniority based on work experience, responsibilities, and expertise.
-
-        #### Required from OpenAI reasoning:
-        - seniority
-        - percentComplete
-        - careerPath
-
+            - 4 level: Fresher, Junior, Middle, Senior.
         #### Output:
         Return only valid JSON formatted as per the schema above.
         Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
-
 
         #### Analyze Content:
         text
