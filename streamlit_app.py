@@ -410,9 +410,9 @@ def main():
                 process_file(uploaded_file, st.session_state.prompt_text)
     
     # Button to generate technical questions
-    if st.button("Generate Questions"):
-        with st.spinner('Generating technical questions...'):
-            generate_technical_questions(extracted_info, st.session_state.question_prompt_text)
+    # if st.button("Generate Questions"):
+    #     with st.spinner('Generating technical questions...'):
+    #         generate_technical_questions(extracted_info, st.session_state.question_prompt_text)
 
 if __name__ == "__main__":
     main()
