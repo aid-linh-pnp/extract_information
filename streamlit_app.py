@@ -159,9 +159,10 @@ def process_file(uploaded_file, user_prompt_text):
                                 "Skill 2",
                                 "..."
                             ],
+                            "job_title": "Job Title",
                             "domains": [
-                                "Domain 1",
-                                "Domain 2",
+                                "Healthcare",
+                                "Banking",
                                 "..."
                             ]
                         }}
