@@ -13,23 +13,35 @@ current_year = datetime.now().year
 
 # Function to read the schema from a file
 def read_schema(schema_path):
-    with open(schema_path, 'r') as file:
-        schema = json.load(file)
-    return schema
+    try:
+        with open(schema_path, 'r') as file:
+            schema = json.load(file)
+        return schema
+    except Exception as e:
+        st.error(f"Error reading schema file: {e}")
+        return None
 
 # Function to extract text from a PDF using pdfplumber
 def extract_text_from_pdf_plumber(pdf_data):
     text = ""
-    with io.BytesIO(pdf_data) as pdf_file:
-        with pdfplumber.open(pdf_file) as pdf:
-            for page in pdf.pages:
-                text += page.extract_text()
-    return text
+    try:
+        with io.BytesIO(pdf_data) as pdf_file:
+            with pdfplumber.open(pdf_file) as pdf:
+                for page in pdf.pages:
+                    text += page.extract_text()
+        return text
+    except Exception as e:
+        st.error(f"Error extracting text from PDF: {e}")
+        return None
 
 # Main function for processing the file and extracting information
 def process_file(uploaded_file, user_prompt_text):
     schema_path = './schema.json'
     schema_json = read_schema(schema_path)
+
+    if schema_json is None:
+        st.error('Error: Schema could not be loaded.')
+        return None
 
     extracted_text = ""
     
@@ -95,30 +107,33 @@ def process_file(uploaded_file, user_prompt_text):
 
     # Make the API request
     st.info("Sending request to OpenAI API...")
-    response = requests.post(
-        endpoint, 
-        headers={'Content-Type': 'application/json', 'api-key': api_key}, 
-        data=json.dumps(data)
-    )
-
-    if response.status_code == 200:
-        # Extract only the content part from OpenAI API's response
-        generated_text = response.json()['choices'][0]['message']['content']
+    try:
+        response = requests.post(
+            endpoint, 
+            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
+            data=json.dumps(data)
+        )
         
-        # Display only the extracted content
-        st.subheader("Extracted Resume Information")
-        try:
-            extracted_info = json.loads(generated_text)  # Try to parse as JSON
-            # Show the parsed JSON if possible
-            st.json(extracted_info)
-        except json.JSONDecodeError:
-            st.error("The returned content is not in valid JSON format.")
-            st.write("Raw response:")
-            st.code(generated_text)
+        if response.status_code == 200:
+            # Extract only the content part from OpenAI API's response
+            generated_text = response.json()['choices'][0]['message']['content']
+            
+            # Display only the extracted content
+            st.subheader("Extracted Resume Information")
+            try:
+                extracted_info = json.loads(generated_text)  # Try to parse as JSON
+                # Show the parsed JSON if possible
+                st.json(extracted_info)
+            except json.JSONDecodeError:
+                st.error("The returned content is not in valid JSON format.")
+                st.write("Raw response:")
+                st.code(generated_text)
         
-    else:
-        st.error(f"Request failed with status code {response.status_code}")
-        st.write(response.text)
+        else:
+            st.error(f"Request failed with status code {response.status_code}")
+            st.write(response.text)
+    except Exception as e:
+        st.error(f"Error during API request: {e}")
 
 # Streamlit interface
 def main():
@@ -128,134 +143,134 @@ def main():
     if 'prompt_text' not in st.session_state:
         st.session_state.prompt_text = """Extract all relevant information from the provided CV and structure it using the schema below. Ensure the extracted information is precise and consistent with the requirements.
 
-#### Schema:
-{
-  "contact": {
-    "phoneNumbers": ["<Extracted Phone 1>", "<Extracted Phone 2>", "..."],
-    "emails": ["<Extracted Email 1>", "<Extracted Email 2>", "..."],
-    "address": "<Extracted Address>"
-  },
-  "nationalities": ["<Extracted Nationality 1>", "<Extracted Nationality 2>", "..."],
-  "profiles": [
-    {
-      "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
-      "url": "<Profile URL>"
-    }
-  ],
-  "professional_summary": "<Extracted Professional Summary>",
-  "work_experiences": [
-    {
-      "jobTitle": "<Extracted Job Title>",
-      "employerName": "<Extracted Employer Name>",
-      "startDate": "<Formatted Start Date (ISO 8601)>",
-      "endDate": "<Formatted End Date (ISO 8601)>",
-      "tenure": "<Calculated Tenure in Months>",
-      "ageAtStart": "<Calculated Age at Start>",
-      "ageAtEnd": "<Calculated Age at End>",
-      "responsibilities": ["<Responsibility 1>", "<Responsibility 2>", "..."],
-      "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
-      "impact": "<Brief description of achievements or outcomes>",
-      "roleType": "<Full-Time, Part-Time, Freelancer>",
-      "timeAllocation": "<Percentage if overlapping roles>",
-      "team": "<Team Name>",
-      "projects": [
+        #### Schema:
         {
-          "projectName": "<Project Name>",
-          "role": "<Role in Project>",
-          "responsibilities": ["<Responsibility 1>", "..."],
-          "skillsUsed": ["<Skill 1>", "..."],
-          "impact": "<Project outcome>"
+          "contact": {
+            "phoneNumbers": ["<Extracted Phone 1>", "<Extracted Phone 2>", "..."],
+            "emails": ["<Extracted Email 1>", "<Extracted Email 2>", "..."],
+            "address": "<Extracted Address>"
+          },
+          "nationalities": ["<Extracted Nationality 1>", "<Extracted Nationality 2>", "..."],
+          "profiles": [
+            {
+              "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
+              "url": "<Profile URL>"
+            }
+          ],
+          "professional_summary": "<Extracted Professional Summary>",
+          "work_experiences": [
+            {
+              "jobTitle": "<Extracted Job Title>",
+              "employerName": "<Extracted Employer Name>",
+              "startDate": "<Formatted Start Date (ISO 8601)>",
+              "endDate": "<Formatted End Date (ISO 8601)>",
+              "tenure": "<Calculated Tenure in Months>",
+              "ageAtStart": "<Calculated Age at Start>",
+              "ageAtEnd": "<Calculated Age at End>",
+              "responsibilities": ["<Responsibility 1>", "<Responsibility 2>", "..."],
+              "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
+              "impact": "<Brief description of achievements or outcomes>",
+              "roleType": "<Full-Time, Part-Time, Freelancer>",
+              "timeAllocation": "<Percentage if overlapping roles>",
+              "team": "<Team Name>",
+              "projects": [
+                {
+                  "projectName": "<Project Name>",
+                  "role": "<Role in Project>",
+                  "responsibilities": ["<Responsibility 1>", "..."],
+                  "skillsUsed": ["<Skill 1>", "..."],
+                  "impact": "<Project outcome>"
+                }
+              ]
+            }
+          ],
+          "education": [
+            {
+              "degree": "<Extracted Degree>",
+              "institution": "<Extracted Institution>",
+              "startYear": "<Start Year>",
+              "endYear": "<End Year>",
+              "score": "<Extracted Score (GPA/Percentage)>"
+            }
+          ],
+          "skills": {
+            "technicalSkills": ["<Technical Skill 1>", "<Technical Skill 2>", "..."],
+            "softSkills": ["<Soft Skill 1>", "<Soft Skill 2>", "..."]
+          },
+          "awards": ["<Award 1>", "<Award 2>", "..."],
+          "certifications": ["<Certification 1>", "<Certification 2>", "..."],
+          "publications": [
+            {
+              "title": "<Publication Title>",
+              "date": "<Publication Date (ISO 8601)>",
+              "journal": "<Journal/Publisher Name>",
+              "description": "<Brief Description>"
+            }
+          ],
+          "languages": [
+            {
+              "language": "<Language Name>",
+              "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
+            }
+          ],
+          "additional_information": ["<Additional Info 1>", "..."],
+          "careerInsights": {
+            "careerPath": "<Summary of career trajectory>",
+            "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
+          },
+          "cv_analysis": {
+            "percentComplete": "<Calculated Completeness Percentage>"
+          }
         }
-      ]
-    }
-  ],
-  "education": [
-    {
-      "degree": "<Extracted Degree>",
-      "institution": "<Extracted Institution>",
-      "startYear": "<Start Year>",
-      "endYear": "<End Year>",
-      "score": "<Extracted Score (GPA/Percentage)>"
-    }
-  ],
-  "skills": {
-    "technicalSkills": ["<Technical Skill 1>", "<Technical Skill 2>", "..."],
-    "softSkills": ["<Soft Skill 1>", "<Soft Skill 2>", "..."]
-  },
-  "awards": ["<Award 1>", "<Award 2>", "..."],
-  "certifications": ["<Certification 1>", "<Certification 2>", "..."],
-  "publications": [
-    {
-      "title": "<Publication Title>",
-      "date": "<Publication Date (ISO 8601)>",
-      "journal": "<Journal/Publisher Name>",
-      "description": "<Brief Description>"
-    }
-  ],
-  "languages": [
-    {
-      "language": "<Language Name>",
-      "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
-    }
-  ],
-  "additional_information": ["<Additional Info 1>", "..."],
-  "careerInsights": {
-    "careerPath": "<Summary of career trajectory>",
-    "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
-  },
-  "cv_analysis": {
-    "percentComplete": "<Calculated Completeness Percentage>"
-  }
-}
 
-#### Guidelines:
-1. *Contact Details*:
-   - Extract all phone numbers and emails mentioned in the CV. Ensure each is listed separately in the phoneNumbers and emails arrays.
+        #### Guidelines:
+        1. *Contact Details*:
+        - Extract all phone numbers and emails mentioned in the CV. Ensure each is listed separately in the phoneNumbers and emails arrays.
 
-2. *Nationalities*:
-   - Extract all nationalities mentioned in the CV and list them in the nationalities array.
+        2. *Nationalities*:
+        - Extract all nationalities mentioned in the CV and list them in the nationalities array.
 
-3. *Profiles*:
-   - Extract all online profiles (e.g., LinkedIn, GitHub) mentioned in the CV, including the platform name and URL.
+        3. *Profiles*:
+        - Extract all online profiles (e.g., LinkedIn, GitHub) mentioned in the CV, including the platform name and URL.
 
-4. *Formatting Dates*:
-   - Ensure all dates are in ISO 8601 format (YYYY-MM-DDTHH:MM:SS.000).
-   - Replace placeholder or incomplete dates (e.g., 2023-00-00) with 2023-01-01T00:00:00.000.
+        4. *Formatting Dates*:
+        - Ensure all dates are in ISO 8601 format (YYYY-MM-DDTHH:MM:SS.000).
+        - Replace placeholder or incomplete dates (e.g., 2023-00-00) with 2023-01-01T00:00:00.000.
 
-5. *Work Experiences*:
-   - Include all positions held at the same company, capturing each distinct job title, time period, team information (if applicable), and detailed responsibilities. If a position was held multiple times or in different teams, treat each as a separate array item.
-   - Include overlapping jobs with accurate start and end dates.
-   - Calculate tenure in months for each role.
-   - Calculate the candidate's age at the start and end of each job:
-     - If the CV does not include the person's birth year, estimate their age by subtracting 22 years from their first year of work.
+        5. *Work Experiences*:
+        - Include all positions held at the same company, capturing each distinct job title, time period, team information (if applicable), and detailed responsibilities. If a position was held multiple times or in different teams, treat each as a separate array item.
+        - Include overlapping jobs with accurate start and end dates.
+        - Calculate tenure in months for each role.
+        - Calculate the candidate's age at the start and end of each job:
+            - If the CV does not include the person's birth year, estimate their age by subtracting 22 years from their first year of work.
 
-6. *Education*:
-   - Include degree, institution, years of study, and score (e.g., GPA, percentage).
+        6. *Education*:
+        - Include degree, institution, years of study, and score (e.g., GPA, percentage).
 
-7. *Skills*:
-   - Extract and list all technical and soft skills mentioned in the CV.
+        7. *Skills*:
+        - Extract and list all technical and soft skills mentioned in the CV.
 
-8. *Awards, Certifications, and Publications*:
-   - Include all awards, certifications, and publications with relevant details.
+        8. *Awards, Certifications, and Publications*:
+        - Include all awards, certifications, and publications with relevant details.
 
-9. *Languages*:
-   - List all languages spoken, along with proficiency levels (e.g., Native, Fluent, Intermediate).
+        9. *Languages*:
+        - List all languages spoken, along with proficiency levels (e.g., Native, Fluent, Intermediate).
 
-10. *Derived Insights*:
-    - Add careerInsights such as careerPath (a summary of the candidate's career trajectory) and industryExperience (industries the candidate has worked in).
+        10. *Derived Insights*:
+            - Add careerInsights such as careerPath (a summary of the candidate's career trajectory) and industryExperience (industries the candidate has worked in).
 
-11. *CV Completeness*:
-    - Evaluate the percentage completeness of the CV based on the presence of key sections (contact, professional summary, work experiences, education, skills).
-    - Assign a percentage (e.g., 100% for a complete CV).
+        11. *CV Completeness*:
+            - Evaluate the percentage completeness of the CV based on the presence of key sections (contact, professional summary, work experiences, education, skills).
+            - Assign a percentage (e.g., 100% for a complete CV).
 
-#### Output:
-Return only valid JSON formatted as per the schema above.
-Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
+        #### Output:
+        Return only valid JSON formatted as per the schema above.
+        Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
 
 
-#### Analyze Content:
-text
-{extracted_text}"""
+        #### Analyze Content:
+        text
+        {extracted_text}"""
 
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
@@ -278,3 +293,6 @@ text
             with st.spinner('Processing with your customized prompt...'):
                 # Pass the current value from session state to ensure latest edits are used
                 process_file(uploaded_file, st.session_state.prompt_text)
+
+if __name__ == "__main__":
+    main()
