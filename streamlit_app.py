@@ -141,86 +141,88 @@ def main():
 
     # Session state to persist the prompt between reruns
     if 'prompt_text' not in st.session_state:
-        st.session_state.prompt_text = """Extract all relevant information from the provided CV and structure it using the schema below. Ensure the extracted information is precise and consistent with the requirements.
+        st.session_state.prompt_text = """### Updated Enhanced Prompt with OpenAI-Friendly Schema
+
+        Extract all relevant information from the provided CV and structure it using the schema below. Ensure the extracted information is precise and consistent with the requirements.
 
         #### Schema:
         {
-          "contact": {
+        "contact": {
             "phoneNumbers": ["<Extracted Phone 1>", "<Extracted Phone 2>", "..."],
             "emails": ["<Extracted Email 1>", "<Extracted Email 2>", "..."],
             "address": "<Extracted Address>"
-          },
-          "nationalities": ["<Extracted Nationality 1>", "<Extracted Nationality 2>", "..."],
-          "profiles": [
+        },
+        "nationalities": ["<Extracted Nationality 1>", "<Extracted Nationality 2>", "..."],
+        "profiles": [
             {
-              "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
-              "url": "<Profile URL>"
+            "platform": "<Platform Name (e.g., LinkedIn, GitHub)>",
+            "url": "<Profile URL>"
             }
-          ],
-          "professional_summary": "<Extracted Professional Summary>",
-          "work_experiences": [
+        ],
+        "professional_summary": "<Extracted Professional Summary>",
+        "work_experiences": [
             {
-              "jobTitle": "<Extracted Job Title>",
-              "employerName": "<Extracted Employer Name>",
-              "startDate": "<Formatted Start Date (ISO 8601)>",
-              "endDate": "<Formatted End Date (ISO 8601)>",
-              "tenure": "<Calculated Tenure in Months>",
-              "ageAtStart": "<Calculated Age at Start>",
-              "ageAtEnd": "<Calculated Age at End>",
-              "responsibilities": ["<Responsibility 1>", "<Responsibility 2>", "..."],
-              "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
-              "impact": "<Brief description of achievements or outcomes>",
-              "roleType": "<Full-Time, Part-Time, Freelancer>",
-              "timeAllocation": "<Percentage if overlapping roles>",
-              "team": "<Team Name>",
-              "projects": [
+            "jobTitle": "<Extracted Job Title>",
+            "employerName": "<Extracted Employer Name>",
+            "startDate": "<Formatted Start Date (ISO 8601)>",
+            "endDate": "<Formatted End Date (ISO 8601)>",
+            "tenure": "<Calculated Tenure in Months>",
+            "ageAtStart": "<Calculated Age at Start>",
+            "ageAtEnd": "<Calculated Age at End>",
+            "responsibilities": ["<Responsibility 1>", "<Responsibility 2>", "..."],
+            "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
+            "impact": "<Brief description of achievements or outcomes>",
+            "roleType": "<Full-Time, Part-Time, Freelancer>",
+            "timeAllocation": "<Percentage if overlapping roles>",
+            "team": "<Team Name>",
+            "projects": [
                 {
-                  "projectName": "<Project Name>",
-                  "role": "<Role in Project>",
-                  "responsibilities": ["<Responsibility 1>", "..."],
-                  "skillsUsed": ["<Skill 1>", "..."],
-                  "impact": "<Project outcome>"
+                "projectName": "<Project Name>",
+                "role": "<Role in Project>",
+                "responsibilities": ["<Responsibility 1>", "..."],
+                "skillsUsed": ["<Skill 1>", "..."],
+                "impact": "<Project outcome>"
                 }
-              ]
+            ]
             }
-          ],
-          "education": [
+        ],
+        "education": [
             {
-              "degree": "<Extracted Degree>",
-              "institution": "<Extracted Institution>",
-              "startYear": "<Start Year>",
-              "endYear": "<End Year>",
-              "score": "<Extracted Score (GPA/Percentage)>"
+            "degree": "<Extracted Degree>",
+            "institution": "<Extracted Institution>",
+            "startYear": "<Start Year>",
+            "endYear": "<End Year>",
+            "score": "<Extracted Score (GPA/Percentage)>"
             }
-          ],
-          "skills": {
+        ],
+        "skills": {
             "technicalSkills": ["<Technical Skill 1>", "<Technical Skill 2>", "..."],
             "softSkills": ["<Soft Skill 1>", "<Soft Skill 2>", "..."]
-          },
-          "awards": ["<Award 1>", "<Award 2>", "..."],
-          "certifications": ["<Certification 1>", "<Certification 2>", "..."],
-          "publications": [
+        },
+        "awards": ["<Award 1>", "<Award 2>", "..."],
+        "certifications": ["<Certification 1>", "<Certification 2>", "..."],
+        "publications": [
             {
-              "title": "<Publication Title>",
-              "date": "<Publication Date (ISO 8601)>",
-              "journal": "<Journal/Publisher Name>",
-              "description": "<Brief Description>"
+            "title": "<Publication Title>",
+            "date": "<Publication Date (ISO 8601)>",
+            "journal": "<Journal/Publisher Name>",
+            "description": "<Brief Description>"
             }
-          ],
-          "languages": [
+        ],
+        "languages": [
             {
-              "language": "<Language Name>",
-              "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
+            "language": "<Language Name>",
+            "proficiency": "<Proficiency Level (e.g., Native, Fluent, Intermediate)>"
             }
-          ],
-          "additional_information": ["<Additional Info 1>", "..."],
-          "careerInsights": {
+        ],
+        "additional_information": ["<Additional Info 1>", "..."],
+        "careerInsights": {
             "careerPath": "<Summary of career trajectory>",
             "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
-          },
-          "cv_analysis": {
+        },
+        "cv_analysis": {
             "percentComplete": "<Calculated Completeness Percentage>"
-          }
+        }
         }
 
         #### Guidelines:
