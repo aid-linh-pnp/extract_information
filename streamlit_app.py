@@ -138,7 +138,7 @@ def process_file(uploaded_file, user_prompt_text):
                 if percent_complete > 80:
                     # If percentComplete is above 80, generate technical questions
                     user_question_prompt = """
-                    Generate 20 technical interview multiple questions based on the following resume information:
+                    Generate 15 technical interview multiple questions based on the following resume information:
                     {json.dumps(extracted_info, indent=2)}
                     The questions should be relevant to the skills and experience listed in the resume.
                     Based on the candidate's seniority, adjust the difficulty level of the questions.
