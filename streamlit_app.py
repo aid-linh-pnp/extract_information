@@ -34,43 +34,6 @@ def extract_text_from_pdf_plumber(pdf_data):
         st.error(f"Error extracting text from PDF: {e}")
         return None
 
-# Function to generate technical questions based on the CV information
-def generate_technical_questions(extracted_info, user_question_prompt):
-    # Process the user prompt by replacing the extracted information
-    final_user_prompt = user_question_prompt.replace("{json.dumps(extracted_info, indent=2)}", json.dumps(extracted_info, indent=2))
-
-    # Make the second API request to generate technical questions
-    data = {
-        "messages": [
-            {"role": "system", "content": "You are an expert technical interviewer. Generate relevant and challenging questions for the candidate based on the provided resume information. Remove ```json."},     
-            {"role": "user", "content": final_user_prompt}
-        ],
-        "max_tokens": 10000,
-        "temperature": 1,
-        "top_p": 0.25
-    }
-
-    st.info("Sending request to OpenAI API for technical questions...")
-    try:
-        response = requests.post(
-            endpoint, 
-            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
-            data=json.dumps(data)
-        )
-        
-        if response.status_code == 200:
-            generated_questions = response.json()['choices'][0]['message']['content']
-            
-            # Display the generated technical questions
-            st.subheader("Generated Technical Questions")
-            st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
-        
-        else:
-            st.error(f"Request failed with status code {response.status_code}")
-            st.write(response.text)
-    except Exception as e:
-        st.error(f"Error during technical questions generation: {e}")
-
 # Main function for processing the file and extracting information
 def process_file(uploaded_file, user_prompt_text):
     schema_path = './schema.json'
@@ -218,6 +181,43 @@ def process_file(uploaded_file, user_prompt_text):
     except Exception as e:
         st.error(f"Error during API request: {e}")
 
+# Function to generate technical questions based on the CV information
+def generate_technical_questions(extracted_info, user_question_prompt):
+    # Process the user prompt by replacing the extracted information
+    final_user_prompt = user_question_prompt.replace("{json.dumps(extracted_info, indent=2)}", json.dumps(extracted_info, indent=2))
+
+    # Make the second API request to generate technical questions
+    data = {
+        "messages": [
+            {"role": "system", "content": "You are an expert technical interviewer. Generate relevant and challenging questions for the candidate based on the provided resume information. Remove ```json."},     
+            {"role": "user", "content": final_user_prompt}
+        ],
+        "max_tokens": 10000,
+        "temperature": 1,
+        "top_p": 0.25
+    }
+
+    st.info("Sending request to OpenAI API for technical questions...")
+    try:
+        response = requests.post(
+            endpoint, 
+            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
+            data=json.dumps(data)
+        )
+        
+        if response.status_code == 200:
+            generated_questions = response.json()['choices'][0]['message']['content']
+            
+            # Display the generated technical questions
+            st.subheader("Generated Technical Questions")
+            st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
+        
+        else:
+            st.error(f"Request failed with status code {response.status_code}")
+            st.write(response.text)
+    except Exception as e:
+        st.error(f"Error during technical questions generation: {e}")
+
 # Streamlit interface
 def main():
     st.title('Resume Information Extractor')
@@ -359,7 +359,7 @@ def main():
         #### Analyze Content:
         text
         {extracted_text}"""
-    
+
     # File uploader
     uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
     
@@ -369,50 +369,18 @@ def main():
     
     # Text area for editing the prompt with key to track changes
     st.text_area(
-        "Edit the prompt to send to OpenAI (Extract CV):", 
+        "Edit the prompt to send to OpenAI:", 
         value=st.session_state.prompt_text, 
         height=400,
         key="prompt_input",
         on_change=update_prompt
     )
     
-    # Add a new input for generating technical questions
-    if 'question_prompt_text' not in st.session_state:
-        st.session_state.question_prompt_text = """Generate 20 technical interview multiple questions based on the following resume information:
-        {json.dumps(extracted_info, indent=2)}
-        The questions should be relevant to the skills and experience listed in the resume.
-        Based on the candidate's seniority, adjust the difficulty level of the questions.
-        Output format: JSON:
-        [
-            {
-            "question": "Question Text",
-            "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-            "correct_answer": "Correct Option",
-            "seniority": "Seniority level",
-            "skills": ["Skill 1", "Skill 2"],
-            "domains": ["Domain 1", "Domain 2"]
-            }
-        ]"""
-    
-    # Text area for editing the question generation prompt
-    st.text_area(
-        "Edit the prompt for generating technical questions:", 
-        value=st.session_state.question_prompt_text, 
-        height=400,
-        key="question_prompt_input",
-        on_change=update_prompt
-    )
-
-    # Process uploaded file
     if uploaded_file is not None:
         if st.button("Extract Information"):
             with st.spinner('Processing with your customized prompt...'):
+                # Pass the current value from session state to ensure latest edits are used
                 process_file(uploaded_file, st.session_state.prompt_text)
-    
-    # Button to generate technical questions
-    # if st.button("Generate Questions"):
-    #     with st.spinner('Generating technical questions...'):
-    #         generate_technical_questions(extracted_info, st.session_state.question_prompt_text)
 
 if __name__ == "__main__":
     main()
