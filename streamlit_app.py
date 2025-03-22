@@ -78,6 +78,7 @@ def process_file(uploaded_file, user_prompt_text):
             Keep the language of the CV unchanged.
             Remove special characters to properly format it as an object before saving it to a JSON file.
             Remove ```json, remove $schema. 
+            seniority just 4 levels: Fresher, Junior, Middle, Senior.
             Required: seniority, careerPath, percentComplete.
         """
     }
@@ -157,6 +158,30 @@ def generate_technical_questions(extracted_info):
     {json.dumps(extracted_info, indent=2)}
     The questions should be relevant to the skills and experience listed in the resume.
     Based on the candidate's seniority, adjust the difficulty level of the questions.
+    Output format: JSON:
+    [
+        {
+            "question": "<Question Text>",
+            "options": [
+            "<Option 1>",
+            "<Option 2>",
+            "<Option 3>",
+            "<Option 4>"
+            ],
+            "correct_answer": "<Correct Option>",
+            "seniority": "<Seniority level>",
+            "skills": [
+            "<Skill 1>",
+            "<Skill 2>",
+            "..."
+            ],
+            "domain": [
+            "<Domain 1>",
+            "<Domain 2>",
+            "..."
+            ]
+        }
+    ]
     """
 
     # Make the second API request to generate technical questions
@@ -319,9 +344,9 @@ def main():
             - Evaluate the percentage completeness of the CV based on the presence of key sections (contact, professional summary, work experiences, education, skills).
             - Assign a percentage (e.g., 100% for a complete CV).
         
-        12. **Seniority**:
-            - Assess the candidate’s seniority based on work experience, responsibilities, and expertise.
-            - Just 4 level: Fresher, Junior, Middle, Senior.
+        12. Seniority:
+            - OpenAI will assess the candidate’s seniority based on the work experience, responsibilities, and expertise mentioned in the CV.
+            - The seniority levels will be classified into 4 categories: Fresher, Junior, Middle, Senior.
         #### Output:
         Return only valid JSON formatted as per the schema above.
         Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
