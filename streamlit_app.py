@@ -160,7 +160,45 @@ def generate_technical_questions(extracted_info):
     # Make the second API request to generate technical questions
     data = {
         "messages": [{"role": "user", "content": technical_questions_prompt}],
-        "max_tokens": 1000,
+        "max_tokens": 10000,
+        "temperature": 1,
+        "top_p": 0.25
+    }
+
+    st.info("Sending request to OpenAI API for technical questions...")
+    try:
+        response = requests.post(
+            endpoint, 
+            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
+            data=json.dumps(data)
+        )
+        
+        if response.status_code == 200:
+            generated_questions = response.json()['choices'][0]['message']['content']
+            
+            # Display the generated technical questions
+            st.subheader("Generated Technical Questions")
+            st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
+        
+        else:
+            st.error(f"Request failed with status code {response.status_code}")
+            st.write(response.text)
+    except Exception as e:
+        st.error(f"Error during technical questions generation: {e}")
+
+# Function to generate technical questions based on the CV information
+def generate_technical_questions(extracted_info):
+    # Prepare the prompt for generating technical questions
+    technical_questions_prompt = f"""
+    Generate 20 technical interview multiple questions based on the following resume information:
+    {json.dumps(extracted_info, indent=2)}
+    The questions should be relevant to the skills and experience listed in the resume.
+    """
+
+    # Make the second API request to generate technical questions
+    data = {
+        "messages": [{"role": "user", "content": technical_questions_prompt}],
+        "max_tokens": 10000,
         "temperature": 1,
         "top_p": 0.25
     }
@@ -224,6 +262,7 @@ def main():
             "skillsUsed": ["<Skill 1>", "<Skill 2>", "..."],
             "impact": "<Brief description of achievements or outcomes>",
             "roleType": "<Full-Time, Part-Time, Freelancer>",
+            "seniority": "<Seniority Level>",
             "timeAllocation": "<Percentage if overlapping roles>",
             "team": "<Team Name>",
             "projects": [
@@ -315,6 +354,9 @@ def main():
         11. *CV Completeness*:
             - Evaluate the percentage completeness of the CV based on the presence of key sections (contact, professional summary, work experiences, education, skills).
             - Assign a percentage (e.g., 100% for a complete CV).
+        
+        12. **Seniority**:
+            - Assess the candidate’s seniority based on work experience, responsibilities, and expertise.
 
         #### Output:
         Return only valid JSON formatted as per the schema above.
