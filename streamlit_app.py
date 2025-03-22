@@ -105,8 +105,8 @@ def process_file(uploaded_file, user_prompt_text):
         "top_p": 0.25
     }
 
-    # Make the API request
-    st.info("Sending request to OpenAI API...")
+    # Make the first API request to extract the CV information
+    st.info("Sending request to OpenAI API for CV extraction...")
     try:
         response = requests.post(
             endpoint, 
@@ -124,6 +124,12 @@ def process_file(uploaded_file, user_prompt_text):
                 extracted_info = json.loads(generated_text)  # Try to parse as JSON
                 # Show the parsed JSON if possible
                 st.json(extracted_info)
+
+                # Check if percentComplete is above 80
+                if "cv_analysis" in extracted_info and extracted_info["cv_analysis"].get("percentComplete", 0) > 80:
+                    # If percentComplete is above 80, generate technical questions
+                    generate_technical_questions(extracted_info)
+
             except json.JSONDecodeError:
                 st.error("The returned content is not in valid JSON format.")
                 st.write("Raw response:")
@@ -134,6 +140,44 @@ def process_file(uploaded_file, user_prompt_text):
             st.write(response.text)
     except Exception as e:
         st.error(f"Error during API request: {e}")
+
+# Function to generate technical questions based on the CV information
+def generate_technical_questions(extracted_info):
+    # Prepare the prompt for generating technical questions
+    technical_questions_prompt = f"""
+    Generate 20 technical interview questions based on the following resume information:
+    {json.dumps(extracted_info, indent=2)}
+    The questions should be relevant to the skills and experience listed in the resume.
+    """
+
+    # Make the second API request to generate technical questions
+    data = {
+        "messages": [{"role": "user", "content": technical_questions_prompt}],
+        "max_tokens": 1000,
+        "temperature": 1,
+        "top_p": 0.25
+    }
+
+    st.info("Sending request to OpenAI API for technical questions...")
+    try:
+        response = requests.post(
+            endpoint, 
+            headers={'Content-Type': 'application/json', 'api-key': api_key}, 
+            data=json.dumps(data)
+        )
+        
+        if response.status_code == 200:
+            generated_questions = response.json()['choices'][0]['message']['content']
+            
+            # Display the generated technical questions
+            st.subheader("Generated Technical Questions")
+            st.text_area("Technical Questions:", value=generated_questions, height=400, disabled=True)
+        
+        else:
+            st.error(f"Request failed with status code {response.status_code}")
+            st.write(response.text)
+    except Exception as e:
+        st.error(f"Error during technical questions generation: {e}")
 
 # Streamlit interface
 def main():
@@ -221,7 +265,7 @@ def main():
             "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
         },
         "cv_analysis": {
-            "percentComplete": "<Calculated Completeness Percentage>"
+            "percentComplete": "<Calculated Completeness Percentage> (eg. 70)"
         }
         }
 
