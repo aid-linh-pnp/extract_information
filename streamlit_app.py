@@ -354,7 +354,7 @@ def main():
         Generate 15 practice code questions based on the following resume information:
         {json.dumps(extracted_info, indent=2)}
         The questions should be relevant to the skills, experience, and domain listed in the resume. Each question should include:
-        Real-life context relevant to the domain (e.g., Healthcare, Banking, etc.) and practical scenarios.
+        Real-life context relevant to the domain (e.g., Automotive, Manufacturing, etc.) and practical scenarios.
         Code-based questions that mimic actual challenges faced in the field.
         Clear instructions on how the candidate should approach the problem (e.g., using algorithms, data structures, etc.).
         Difficulty level adjustment based on the candidate’s seniority (Junior, Mid-level, Senior).
@@ -378,8 +378,8 @@ def main():
                 ],
                 "job_title": "Job Title",
                 "domains": [
-                    "Healthcare",
-                    "Banking",
+                    "Automotive",
+                    "Manufacturing",
                     "..."
                 ]
             }
