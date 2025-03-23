@@ -74,7 +74,7 @@ def process_file(uploaded_file, user_prompt_text):
     # System message remains fixed
     system_message = {
         "role": "system",
-        "content": """
+        "content": f"""
             You are an AI assistant that helps extract information from resumes (CVs).
             Keep the language of the CV unchanged.
             Remove special characters to properly format it as an object before saving it to a JSON file.
