@@ -45,6 +45,7 @@
         ],
         "impact": "<Brief description of achievements or outcomes>",
         "roleType": "<Full-Time, Part-Time, Freelancer>",
+        "seniority": "<Seniority Level>",
         "timeAllocation": "<Percentage if overlapping roles>",
         "team": "<Team Name>",
         "projects": [

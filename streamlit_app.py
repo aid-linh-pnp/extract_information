@@ -79,7 +79,7 @@ def process_file(uploaded_file, user_prompt_text):
             Remove special characters to properly format it as an object before saving it to a JSON file.
             Remove ```json, remove $schema. 
             seniority just 4 levels: Fresher, Junior, Middle, Senior.
-            Required: seniority, careerPath, percentComplete.
+            Required: seniority, careerPath, percentComplete, prediction.
         """
     }
 
@@ -279,6 +279,14 @@ def main():
             "careerPath": "<Summary of career trajectory> (required from OpenAI)",
             "industryExperience": ["<Industry 1>", "<Industry 2>", "..."]
         },
+        "prediction": {
+            "time_to_leave_current_company": "<Predicted Time to Leave>",
+            "reasons_for_leaving": [
+            "<Reason 1>",
+            "<Reason 2>",
+            "..."
+            ]
+        },
         "cv_analysis": {
             "percentComplete": "<Calculated Completeness Percentage> (eg. 70) (required from OpenAI)"
         }
@@ -331,6 +339,10 @@ def main():
         Return only valid JSON formatted as per the schema above.
         Ensure the JSON is clean and does not include any unnecessary explanations or formatting issues.
 
+        13. *Predictions*:
+            - Predict when the candidate is likely to leave their current company (time_to_leave_current_company) based on their tenure patterns, career progression, and external trends.
+            - Provide possible reasons for leaving (reasons_for_leaving), such as lack of growth opportunities, better offers, or role stagnation.
+            
         #### Analyze Content:
         text
         {extracted_text}"""
