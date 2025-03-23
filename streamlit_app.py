@@ -10,6 +10,7 @@ api_key = st.secrets["azure_openai"]["api_key"]
 endpoint = st.secrets["azure_openai"]["endpoint"]
 
 current_year = datetime.now().year
+current_month = datetime.now().month
 
 # Function to read the schema from a file
 def read_schema(schema_path):
@@ -80,6 +81,7 @@ def process_file(uploaded_file, user_prompt_text):
             Remove ```json, remove $schema. 
             seniority just 4 levels: Fresher, Junior, Middle, Senior.
             Required: seniority, careerPath, percentComplete, prediction.
+            This time is {current_year}/{current_month}.
         """
     }
 
