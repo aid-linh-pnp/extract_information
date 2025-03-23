@@ -351,34 +351,40 @@ def main():
 
     if 'question_prompt_text' not in st.session_state:
         st.session_state.question_prompt_text = """
-        Generate 15 technical interview multiple questions based on the following resume information:
+        Generate 15 technical interview questions based on the following resume information:
         {json.dumps(extracted_info, indent=2)}
-        The questions should be relevant to the skills and experience listed in the resume.
-        Based on the candidate's seniority, adjust the difficulty level of the questions.
-        Output format: JSON:
+        The questions should be relevant to the skills, experience, and domain listed in the resume. For each question:
+        Provide real-time context specific to the domain (e.g., Healthcare, Banking, etc.)
+        Include code-related questions when applicable, and ask for a solution with explanations.
+        Adjust the difficulty level based on the candidate's seniority (Junior, Mid-level, Senior).
+        Provide multiple-choice options for the questions (if suitable).
+        Output the results in the following JSON format:
         [
-            {
-                "question": "Question Text",
-                "options": [
-                    "Option 1",
-                    "Option 2",
-                    "Option 3",
-                    "Option 4"
-                ],
-                "correct_answer": "Correct Option",
-                "seniority": "Seniority level",
-                "skills": [
-                    "Skill 1",
-                    "Skill 2",
-                    "..."
-                ],
-                "job_title": "Job Title",
-                "domains": [
-                    "Healthcare",
-                    "Banking",
-                    "..."
-                ]
-            }
+        {
+            "question": "Question Text",
+            "options": [
+            "Option 1",
+            "Option 2",
+            "Option 3",
+            "Option 4"
+            ],
+            "correct_answer": "Correct Option",
+            "seniority": "Seniority level",
+            "skills": [
+            "Skill 1",
+            "Skill 2",
+            "..."
+            ],
+            "job_title": "Job Title",
+            "domains": [
+            "Healthcare",
+            "Banking",
+            "..."
+            ],
+            "context": "Realtime context with respect to the domain, e.g., real-time data processing in healthcare",
+            "code_example": "Provide relevant code examples if applicable",
+            "explanation": "Explanation of the correct answer and code, if necessary"
+        }
         ]
         """
     
